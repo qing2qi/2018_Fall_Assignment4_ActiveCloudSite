@@ -65,6 +65,72 @@
     });
 }
 
+function getStock(symbols, priceRangeRates) {
+
+    var canvasStock = document.getElementById("myStock").getContext('2d');
+    var myStock = new Chart(canvasStock, {
+        type: 'bar',
+        data: {
+            labels: symbols.split(","),
+            datasets: [{
+                label: 'price score',
+                yAxisID: 'H',
+                data: priceRangeRates.split(","),
+                type: 'line',
+                borderColor: 'rgba(0, 103, 71, 1)',
+                backgroundColor: 'rgba(0, 103, 71, 0.1)',
+                lineTension: 0
+            }]
+        },
+        options: {
+            animation: {
+                duration: 0
+            },
+            responsive: false,
+            scales: {
+                yAxes: [{
+                    id: 'H',
+                    type: 'linear',
+                    position: 'left',
+                }]
+            },
+            annotation: {
+                drawTime: 'afterDatasetsDraw',
+                annotations: [
+                    {
+                        id: 'highprice',
+                        type: 'line',
+                        mode: 'horizontal',
+                        scaleID: 'H',
+                        value: 0.82,
+                        borderColor: 'red',
+                        borderWidth: 1,
+                        label: {
+                            backgroundColor: "red",
+                            content: "0.82",
+                            enabled: true,
+                            position: 'left'
+                        }
+                    }, {
+                        id: 'lowprice',
+                        type: 'line',
+                        mode: 'horizontal',
+                        scaleID: 'H',
+                        value: 0.41,
+                        borderColor: 'red',
+                        borderWidth: 1,
+                        label: {
+                            backgroundColor: "red",
+                            content: "0.41",
+                            enabled: true,
+                            position: 'left'
+                        }
+                    }]
+            }
+        }
+    });
+
+}
 function alertDbSave(success) {
     if (success === 1) {
         alert("Data saved successfully");

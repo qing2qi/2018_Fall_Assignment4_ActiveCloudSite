@@ -167,6 +167,57 @@ namespace MVCTemplate.Controllers
             double avgvol = equities.Average(e => e.volume) / 1000000; //Divide volume by million
             return new CompaniesEquities(companies, equities.Last(), dates, prices, volumes, avgprice, avgvol);
         }
+        /****
+         * @author qing qi
+         * Recommend stock by 52-Week Price Range Recommendation Strategy, which means you better to choose
+         * the stock that the price change range is larger than 0.82(82%)
+        ****/
+        public IActionResult recommend()
+        {
+            List<Company> companiesList = dbContext.Companies.ToList();
+            List<Equity> equities = new List<Equity>();
+            List<Double> pricreRangeRateList = new List<double>();//all stock price increase rate
+            List<String> symbolList = new List<String>();//all stock symbol
+            List<Company> stockChose = new List<Company>();//stock you better to choose
+            List<double> stockChosePrice = new List<double>();// price increase rate of stock you better to choose
+            string symbolString = "";
+            string priceRangeRate = "";
+            if (companiesList != null)
+            {
+                foreach (Company company in companiesList)
+                {
+                    IEXHandler webHandler = new IEXHandler();
+                    String symbol = company.symbol;
+                    symbolList.Add(symbol);
+                    equities = webHandler.GetChart(company.symbol);
+                    if (equities != null)
+                    {
+                        equities = equities.OrderBy(c => c.date).ToList(); //Make sure the data is in ascending order of date.
+                        float maxprice = equities.Max(e => e.high);
+                        float minprice = equities.Min(e => e.low);
+                        Equity current = equities.Last();
+                        float currentPrice = current.high;
+                        double pricre_Range_Rate = 0.0;
+                        if (maxprice != minprice)//in case messy data makes the denominator zero below
+                        {
+                            pricre_Range_Rate = Math.Round((currentPrice - minprice) / (maxprice - minprice), 2);
+                        }
+                        pricreRangeRateList.Add(pricre_Range_Rate);// for joinning to string below
+                        if (pricre_Range_Rate >= 0.82)// the stocks you better to choose
+                        {
+                            stockChose.Add(company);
+                            stockChosePrice.Add(pricre_Range_Rate);
+                        }
+                    }
+                }
+                if(pricreRangeRateList!=null&& symbolList != null) {
+                    priceRangeRate = string.Join(",", pricreRangeRateList);//list to string for js use in the page
+                    symbolString = string.Join(",", symbolList);
+                }
+            }
+            RecommendStock RecommendStock = new RecommendStock(stockChose, stockChosePrice, symbolString, priceRangeRate);
+            return View("recommend", RecommendStock);
+        }
 
     }
 }
