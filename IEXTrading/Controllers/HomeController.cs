@@ -208,6 +208,12 @@ namespace MVCTemplate.Controllers
                             stockChose.Add(company);
                             stockChosePrice.Add(pricre_Range_Rate);
                         }
+                        //if (dbContext.RecommendStocks.Where(c => c.symbol.Equals(symbol)).Count() == 0)
+                        //{
+
+                        //    StockRecommend priceScoreObj = new StockRecommend(symbol, company.name, current.date, company.isEnabled, pricre_Range_Rate);
+                        //    dbContext.RecommendStocks.Add(priceScoreObj);
+                        //}
                     }
                 }
                 if(pricreRangeRateList!=null&& symbolList != null) {
